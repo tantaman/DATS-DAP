@@ -12,7 +12,7 @@
 
 var vows = require("vows"),
 assert = require("assert"),
-FilterParser = require("../FilterParser").FilterParser;
+FilterParser = require("../DatsDap").FilterParser;
 
 var tests = vows.describe("ServiceRegistry").addBatch({
 	"comparison operators": {
