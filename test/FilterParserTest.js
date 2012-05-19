@@ -194,8 +194,23 @@ var tests = vows.describe("ServiceRegistry").addBatch({
 			assert.isTrue(result);
 		},
 
-		"is a substring": function(topic) {
-			
+		"is a substring": function(parser) {
+			var string = "(a=some*)";
+			var filter = parser.compile(string);
+
+			var map = {
+				a: "something"
+			};
+			result = filter.evaluate(map);
+			assert.isTrue(result);
+
+			string = "(o=the*movie*is*)";
+			filter = parser.compile(string);
+			map = {
+				o: "the best movie ever is conan the barbarian \\(Arnold version\\)"
+			}
+			result = filter.evaluate(map);
+			assert.isTrue(result);
 		}
 	},
 
@@ -268,7 +283,7 @@ var tests = vows.describe("ServiceRegistry").addBatch({
 	"nested logic": {
 		topic: new FilterParser(),
 		"omgnuts": function() {
-			
+
 		}
 	},
 

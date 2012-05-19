@@ -68,10 +68,11 @@ function SubstrOp(attr, value) {
  	this.type = "substr"; 
  	this.attr = attr; 
  	this.value = value;
- 	this.value.replace(replaceReg, ".*");
+ 	this.value = this.value.replace(replaceReg, ".*");
 
  	this.value = new RegExp(this.value);
 }
+
 SubstrOp.prototype = {
 	evaluate: function(properties) {
 		var val = properties[this.attr];
