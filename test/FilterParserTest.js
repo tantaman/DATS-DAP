@@ -150,12 +150,137 @@ var tests = vows.describe("ServiceRegistry").addBatch({
 			assert.isFalse(result);
 		},
 
-		"greater than or equal to": function(topic) {
-			
+		"greater than or equal to": function(parser) {
+			var string = "(a>=0)";
+			var filter = parser.compile(string);
+
+			var map = {
+				a: -1
+			};
+			var result = filter.evaluate(map);
+			assert.isFalse(result);
+
+			map = {
+				a: 0
+			};
+			result = filter.evaluate(map);
+			assert.isTrue(result);
+
+			map = {
+				a: 1
+			};
+			result = filter.evaluate(map);
+			assert.isTrue(result);
+
+			string = "(a>=b)";
+			filter = parser.compile(string);
+
+			map = {
+				a: "a"
+			};
+			result = filter.evaluate(map);
+			assert.isFalse(result);
+
+			map = {
+				a: "b"
+			};
+			result = filter.evaluate(map);
+			assert.isTrue(result);
+
+			map = {
+				a: "c"
+			};
+			result = filter.evaluate(map);
+			assert.isTrue(result);
 		},
 
 		"is a substring": function(topic) {
-
+			
 		}
+	},
+
+	"logical operators": {
+		topic: new FilterParser(),
+		"not": function(parser) {
+			var string = "(!(a=jacob))";
+			var filter = parser.compile(string);
+
+			var map = {
+				a: "jacob"
+			};
+			var result = filter.evaluate(map);
+			assert.isFalse(result);
+
+			map = {
+				a: "jack"
+			};
+			result = filter.evaluate(map);
+			assert.isTrue(result);
+		},
+
+		"and": function(parser) {
+			var string = "(&(a=jack)(b=sawyer))";
+			var filter = parser.compile(string);
+
+			var plane = {
+				a: "jack",
+				b: "sawyer",
+				c: "kate"
+			};
+			var result = filter.evaluate(plane);
+			assert.isTrue(result);
+
+			plane = {
+				a: "rose",
+				b: "bernard"
+			};
+			result = filter.evaluate(plane);
+			assert.isFalse(result);
+		},
+
+		"or": function(parser) {
+			var string = "(|(a=locke)(b=flocke))";
+			var filter = parser.compile(string);
+
+			var map = {
+				a: "flocke",
+				b: "flocke"
+			};
+			var result = filter.evaluate(map);
+			assert.isTrue(result);
+
+			map = {
+				a: "locke",
+				b: "mystery matt"
+			};
+			result = filter.evaluate(map);
+			assert.isTrue(result);
+
+			map = {
+				a: "echo",
+				b: "desmond"
+			};
+			result = filter.evaluate(map);
+			assert.isFalse(result);
+		}
+	},
+
+	"nested logic": {
+		topic: new FilterParser(),
+		"omgnuts": function() {
+			
+		}
+	},
+
+	"attributes can have a variety of characters": {
+
+	},
+
+	"values can too": {
+
+	},
+
+	"alltogethernow": {
+
 	}
 }).run();

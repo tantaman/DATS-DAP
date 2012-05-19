@@ -135,7 +135,7 @@ LogicalOr.prototype = {
 function LogicalNot() { this.type = "not"; }
 LogicalNot.prototype = {
 	evaluate: function(properties) {
-		return !!this.args.filters[0].evaluate(properties);
+		return !!!this.args.evaluate(properties);
 	}
 };
 
