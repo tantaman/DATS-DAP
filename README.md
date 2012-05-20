@@ -21,7 +21,7 @@ var properties = {
 	cn: "Baby"	
 };
 
-if (filter.evaluate(properties)) {
+if (filter.matches(properties)) {
 	... play some music ...
 }
 ```

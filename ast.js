@@ -6,62 +6,50 @@ var util = require("util");
 
 var whitespaceReg = /\s+/g;
 
-function Stack() {
-	this._arr = [];
-}
+function AbstractOp() {}
+AbstractOp.prototype = {
+	matches: function(properties) {
+		var propertyValue = properties[this.attr];
+		if (propertyValue instanceof Array) {
+			for (var i = 0; i < propertyValue.length; ++i) {
+				if (this.__match(propertyValue[i]))
+					return true;
+			}
+		} else {
+			return this.__match(propertyValue);
+		}
 
-Stack.prototype = {
-	push: function(elem) {
-		this._arr.push(elem);
-		return this;
-	},
-
-	pop: function() {
-		return this._arr.pop();
-	},
-
-	last: function() {
-		return this._arr[this._arr.length - 1];
-	},
-
-	first: function() {
-		return this._arr[0];
+		return false;
 	}
 };
 
-
 function ApproxOp() { this.type = "approx"; }
-ApproxOp.prototype = {
-	evaluate: function(properties) {
-		var val = properties[this.attr];
-		if (val == null)
-			return false;
-		
-		return properties[this.attr].toLowerCase().replace(whitespaceReg, "") == 
-			this.value.toLowerCase().replace(whitespaceReg, ""); // More robust impl?
-	}
+ApproxOp.prototype = Object.create(AbstractOp.prototype);
+ApproxOp.prototype.__match = function(val) {
+	if (val == null)
+		return false;
+
+	return val.toLowerCase().replace(whitespaceReg, "") == 
+		this.value.toLowerCase().replace(whitespaceReg, ""); // More robust impl?
 };
 
 function LteOp() { this.type = "lte"; }
-LteOp.prototype = {
-	evaluate: function(properties) {
-		return properties[this.attr] <= this.value;
-	}
-};
+LteOp.prototype = Object.create(AbstractOp.prototype);
+LteOp.prototype.__match = function(val) {
+	return val <= this.value;
+}
 
 function GteOp() { this.type = "gte"; }
-GteOp.prototype = {
-	evaluate: function(properties) {
-		return properties[this.attr] >= this.value;
-	}
-};
+GteOp.prototype = Object.create(AbstractOp.prototype);
+GteOp.prototype.__match = function(val) {
+	return val >= this.value;
+}
 
 function EqualOp(attr, value) { this.type = "equal"; this.attr = attr; this.value = value; }
-EqualOp.prototype = {
-	evaluate: function(properties) {
-		return properties[this.attr] == this.value;
-	}
-};
+EqualOp.prototype = Object.create(AbstractOp.prototype);
+EqualOp.prototype.__match = function(val) {
+	return val == this.value;
+}
 
 var replaceReg = /[*]/g
 function SubstrOp(attr, value) {
@@ -73,20 +61,18 @@ function SubstrOp(attr, value) {
  	this.value = new RegExp(this.value);
 }
 
-SubstrOp.prototype = {
-	evaluate: function(properties) {
-		var val = properties[this.attr];
-		if (val != null) {
-			return this.value.exec(val) != null;
-		} else {
-			return false;
-		}
+SubstrOp.prototype = Object.create(AbstractOp.prototype);
+SubstrOp.prototype.__match = function(val) {
+	if (val != null) {
+		return this.value.exec(val) != null;
+	} else {
+		return false;
 	}
 }
 
 function PresentOp() { this.type = "present"; }
 PresentOp.prototype = {
-	evaluate: function(properties) {
+	matches: function(properties) {
 		// Is a null property a present property?
 		return properties[this.attr] !== undefined;
 	}
@@ -120,23 +106,23 @@ FilterList.prototype = {
 
 function LogicalAnd() { this.type = "and"; }
 LogicalAnd.prototype = {
-	evaluate: function(properties) {
-		return this.args.filters[0].evaluate(properties) && this.args.filters[1].evaluate(properties);
+	matches: function(properties) {
+		return this.args.filters[0].matches(properties) && this.args.filters[1].matches(properties);
 	}
 }
 
 function LogicalOr() { this.type = "or"; }
 LogicalOr.prototype = {
-	evaluate: function(properties) {
-		return this.args.filters[0].evaluate(properties) || this.args.filters[1].evaluate(properties);
+	matches: function(properties) {
+		return this.args.filters[0].matches(properties) || this.args.filters[1].matches(properties);
 	}
 };
 
 
 function LogicalNot() { this.type = "not"; }
 LogicalNot.prototype = {
-	evaluate: function(properties) {
-		return !!!this.args.evaluate(properties);
+	matches: function(properties) {
+		return !!!this.args.matches(properties);
 	}
 };
 
@@ -145,8 +131,8 @@ function Filter(comp) {
 }
 
 Filter.prototype = {
-	evaluate: function(properties) {
-		return this.comp.evaluate(properties);
+	matches: function(properties) {
+		return this.comp.matches(properties);
 	}
 }
 
@@ -174,7 +160,8 @@ function createFilterList(filter) {
 }
 
 function createFilter(comp) {
-	return new Filter(comp);
+	//return new Filter(comp);
+	return comp;
 }
 
 function createLogical(type) {
@@ -192,7 +179,6 @@ function createLogical(type) {
 
 // TODO: we need to make jison return stuff... instead of registering crap into globals...
 var resultHolder = {};
-
 function complete(filter) {
 	resultHolder.result = filter;
 }

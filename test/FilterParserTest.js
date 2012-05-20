@@ -23,17 +23,17 @@ var tests = vows.describe("ServiceRegistry").addBatch({
 			var filter = parser.compile(testString);
 
 			var testMap = {
-				cn: "Hello there"
+				cn: ["Hello", "Hello there"]
 			};
 
-			var result = filter.evaluate(testMap);
+			var result = filter.matches(testMap);
 			assert.isTrue(result);
 
 			testMap = {
 				cn: "Goodbye there"
 			};
 
-			result = filter.evaluate(testMap);
+			result = filter.matches(testMap);
 			assert.isFalse(result);
 
 			testString = "(a=1)";
@@ -42,14 +42,14 @@ var tests = vows.describe("ServiceRegistry").addBatch({
 			};
 
 			filter = parser.compile(testString);
-			result = filter.evaluate(testMap);
+			result = filter.matches(testMap);
 			assert.isTrue(result);
 
 			testMap = {
 				a: 10
 			};
 
-			result = filter.evaluate(testMap);
+			result = filter.matches(testMap);
 			assert.isFalse(result);
 		},
 
@@ -61,21 +61,21 @@ var tests = vows.describe("ServiceRegistry").addBatch({
 				a: "We are wonderful"
 			};
 
-			var result = filter.evaluate(testMap);
+			var result = filter.matches(testMap);
 			assert.isTrue(result);
 
 			testMap = {
 				a: "wearewonderful"
 			};
 
-			result = filter.evaluate(testMap);
+			result = filter.matches(testMap);
 			assert.isTrue(result);
 
 			testMap = {
 				a: "wearewonderfu"
 			};
 
-			result = filter.evaluate(testMap);
+			result = filter.matches(testMap);
 			assert.isFalse(result);
 		},
 
@@ -87,21 +87,21 @@ var tests = vows.describe("ServiceRegistry").addBatch({
 				a: "present"
 			};
 
-			var result = filter.evaluate(testMap);
+			var result = filter.matches(testMap);
 			assert.isTrue(result);
 
 			testMap = {
 				b: "present"
 			};
 
-			result = filter.evaluate(testMap);
+			result = filter.matches(testMap);
 			assert.isFalse(result);
 
 			testMap = {
 				a: 1
 			};
 
-			result = filter.evaluate(testMap);
+			result = filter.matches(testMap);
 			assert.isTrue(result);
 		},
 
@@ -113,19 +113,19 @@ var tests = vows.describe("ServiceRegistry").addBatch({
 				a: 4
 			};
 
-			var result = filter.evaluate(map);
+			var result = filter.matches(map);
 			assert.isTrue(result);
 
 			map = {
 				a: 5
 			};
-			result = filter.evaluate(map);
+			result = filter.matches(map);
 			assert.isTrue(result);
 
 			map = {
 				a: 6
 			};
-			result = filter.evaluate(map);
+			result = filter.matches(map);
 			assert.isFalse(result);
 
 			string = "(a<=f)";
@@ -134,19 +134,19 @@ var tests = vows.describe("ServiceRegistry").addBatch({
 				a: "a"
 			};
 
-			result = filter.evaluate(map);
+			result = filter.matches(map);
 			assert.isTrue(result);
 
 			map = {
 				a: "f"
 			};
-			result = filter.evaluate(map);
+			result = filter.matches(map);
 			assert.isTrue(result);
 
 			map = {
 				a: "g"
 			};
-			result = filter.evaluate(map);
+			result = filter.matches(map);
 			assert.isFalse(result);
 		},
 
@@ -157,19 +157,19 @@ var tests = vows.describe("ServiceRegistry").addBatch({
 			var map = {
 				a: -1
 			};
-			var result = filter.evaluate(map);
+			var result = filter.matches(map);
 			assert.isFalse(result);
 
 			map = {
 				a: 0
 			};
-			result = filter.evaluate(map);
+			result = filter.matches(map);
 			assert.isTrue(result);
 
 			map = {
 				a: 1
 			};
-			result = filter.evaluate(map);
+			result = filter.matches(map);
 			assert.isTrue(result);
 
 			string = "(a>=b)";
@@ -178,19 +178,19 @@ var tests = vows.describe("ServiceRegistry").addBatch({
 			map = {
 				a: "a"
 			};
-			result = filter.evaluate(map);
+			result = filter.matches(map);
 			assert.isFalse(result);
 
 			map = {
 				a: "b"
 			};
-			result = filter.evaluate(map);
+			result = filter.matches(map);
 			assert.isTrue(result);
 
 			map = {
 				a: "c"
 			};
-			result = filter.evaluate(map);
+			result = filter.matches(map);
 			assert.isTrue(result);
 		},
 
@@ -201,7 +201,7 @@ var tests = vows.describe("ServiceRegistry").addBatch({
 			var map = {
 				a: "something"
 			};
-			result = filter.evaluate(map);
+			result = filter.matches(map);
 			assert.isTrue(result);
 
 			string = "(o=the*movie*is*)";
@@ -209,7 +209,7 @@ var tests = vows.describe("ServiceRegistry").addBatch({
 			map = {
 				o: "the best movie ever is conan the barbarian \\(Arnold version\\)"
 			}
-			result = filter.evaluate(map);
+			result = filter.matches(map);
 			assert.isTrue(result);
 		}
 	},
@@ -223,13 +223,13 @@ var tests = vows.describe("ServiceRegistry").addBatch({
 			var map = {
 				a: "jacob"
 			};
-			var result = filter.evaluate(map);
+			var result = filter.matches(map);
 			assert.isFalse(result);
 
 			map = {
 				a: "jack"
 			};
-			result = filter.evaluate(map);
+			result = filter.matches(map);
 			assert.isTrue(result);
 		},
 
@@ -242,14 +242,14 @@ var tests = vows.describe("ServiceRegistry").addBatch({
 				b: "sawyer",
 				c: "kate"
 			};
-			var result = filter.evaluate(plane);
+			var result = filter.matches(plane);
 			assert.isTrue(result);
 
 			plane = {
 				a: "rose",
 				b: "bernard"
 			};
-			result = filter.evaluate(plane);
+			result = filter.matches(plane);
 			assert.isFalse(result);
 		},
 
@@ -261,21 +261,21 @@ var tests = vows.describe("ServiceRegistry").addBatch({
 				a: "flocke",
 				b: "flocke"
 			};
-			var result = filter.evaluate(map);
+			var result = filter.matches(map);
 			assert.isTrue(result);
 
 			map = {
 				a: "locke",
 				b: "mystery matt"
 			};
-			result = filter.evaluate(map);
+			result = filter.matches(map);
 			assert.isTrue(result);
 
 			map = {
 				a: "echo",
 				b: "desmond"
 			};
-			result = filter.evaluate(map);
+			result = filter.matches(map);
 			assert.isFalse(result);
 		}
 	},

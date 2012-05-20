@@ -22,33 +22,3 @@ FilterParser.prototype = {
 }
 
 exports.FilterParser = FilterParser;
-
-
-//jisonParser.parse('(&(type=Person)(|(sn=Jensen)(cn=Babs J*)))');
-
-//console.log(util.inspect(ast.resultHolder.result, false, null));
-
-// var result = ast.resultHolder.result;
-// var matched = result.evaluate({
-// 	type: "Person",
-// 	sn: "Jensen",
-// 	cn: "Babs Jr"
-// });
-
-// console.log("Matched? " + matched);
-
-// matched = result.evaluate({
-// 	type: "Dog",
-// 	sn: "Jensen",
-// 	cn: "Babs Jr"
-// });
-
-// console.log("Matched? " + matched);
-
-// matched = result.evaluate({
-// 	type: "Person",
-// 	sn: "Jen",
-// 	cn: "Babs J"
-// });
-
-// console.log("Matched? " + matched);
