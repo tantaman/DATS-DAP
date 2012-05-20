@@ -16,10 +16,27 @@ AbstractOp.prototype = {
 					return true;
 			}
 		} else {
-			return this.__match(propertyValue);
+			if (propertyValue instanceof Object) {
+				var constructor = propertyValue.constructor;
+				if (constructor.length === 1) {
+					if (typeof propertyValue.compareTo === "function") {
+						var myValue = new constructor(this.value);
+						return propertyValue.compareTo(myValue) === 0;
+					} else if (typeof propertyValue.equals === "function") {
+						var myValue = new constructor(this.value);
+						return propertyValue.equals(myValue);
+					}
+				}
+			} else {
+				return this.__match(propertyValue);
+			}
 		}
 
 		return false;
+	},
+
+	canCompare: function(obj) {
+		return typeof obj.equals === "function" || typeof obj.compareTo === "function";
 	}
 };
 

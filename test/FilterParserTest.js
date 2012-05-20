@@ -282,8 +282,71 @@ var tests = vows.describe("ServiceRegistry").addBatch({
 
 	"nested logic": {
 		topic: new FilterParser(),
-		"omgnuts": function() {
+		"two levels of ands and ors": function(parser) {
+			var string = "(&(a=1)(|(b=2)(c=3)))";
+			var filter = parser.compile(string);
 
+			var map = {
+				a: 1,
+				b: 2,
+				c: 5
+			};
+			var result = filter.matches(map);
+			assert.isTrue(result);
+
+			map.b = 3;
+			result = filter.matches(map);
+			assert.isFalse(result);
+
+			map.c = 3;
+			result = filter.matches(map);
+			assert.isTrue(result);
+
+			map.a = 2;
+			result = filter.matches(map);
+			assert.isFalse(result);
+
+			string = "(|(&(a=1)(b=2))(c=3))";
+			filter = parser.compile(string);
+
+			map = { a: 1, b: 2, c: 3 };
+			result = filter.matches(map);
+			assert.isTrue(result);
+
+			map.a = 2;
+			result = filter.matches(map);
+			assert.isTrue(result);
+
+			map.c = 4;
+			result = filter.matches(map);
+			assert.isFalse(result);
+
+			map.a = 1;
+			result = filter.matches(map);
+			assert.isTrue(result);
+
+			map.b = 3;
+			result = filter.matches(map);
+			assert.isFalse(result);
+		},
+
+		"two levels of ands, ors, nots": function(parser) {
+			var string = "(&(!(a=james*))(|(b=jerome)(c=3)))";
+			var filter = parser.compile(string);
+
+			var map = {
+				a: "james",
+				b: "jerome",
+				c: 3
+			};
+			var result = filter.matches(map);
+			assert.isFalse(result);
+
+			
+		},
+
+		"arbitrary levels of ands, ors, nots": function() {
+			
 		}
 	},
 
@@ -292,6 +355,14 @@ var tests = vows.describe("ServiceRegistry").addBatch({
 	},
 
 	"values can too": {
+
+	},
+
+	"arrays work for attribute values": {
+
+	},
+
+	"some object work for attribute values": {
 
 	},
 
