@@ -342,28 +342,125 @@ var tests = vows.describe("ServiceRegistry").addBatch({
 			var result = filter.matches(map);
 			assert.isFalse(result);
 
-			
+			map.a = "ja";
+			result = filter.matches(map);
+			assert.isTrue(result);
 		},
 
-		"arbitrary levels of ands, ors, nots": function() {
-			
+		"arbitrary levels of ands, ors, nots": function(parser) {
+			var string = "(! (& (| (name=one of*) (age=22) ) (! (length>=10) ) ) )";
+			var filter = parser.compile(string);
+
+			var map = {
+				name: "one of those",
+				age: 33,
+				length: 22
+			};
+			var result = filter.matches(map);
+			assert.isTrue(result);
 		}
 	},
 
 	"attributes can have a variety of characters": {
+		topic: new FilterParser(),
+		"dots dashes spaces plusses percents dollars o my": function(parser) {
+			var string = "(a+wonder|fully_silly.attribute&string:this^is=*)";
+			var filter = parser.compile(string);
 
+			var map = {
+				"a+wonder|fully_silly.attribute&string:this^is": true
+			};
+			var result = filter.matches(map);
+			assert.isTrue(result);
+
+			map = {};
+			result = filter.matches(map);
+			assert.isFalse(result);
+		}
 	},
 
 	"values can too": {
+		topic: new FilterParser(),
+		"dots dashes spaces etc": function(parser) {
+			// TODO: should we strip slashies on the values?
+			var string = "(attr=a\\*really\\(ridiculous\\)value_string^\\* !! :o\\\\)";
+			var filter = parser.compile(string);;
 
+			var map = {
+				attr: "a*really(ridiculous)value_string^* !! :o\\"
+			};
+			var result = filter.matches(map);
+			assert.isTrue(result);
+		}
 	},
 
 	"arrays work for attribute values": {
+		topic: new FilterParser(),
+		"if we match one element of the array, we return true": function(parser) {
+			var string = "(attr=1)";
+			var filter = parser.compile(string);
 
+			var map = {
+				attr: [0,1,2,3,4]
+			};
+			var result = filter.matches(map);
+			assert.isTrue(result);
+		},
+
+		"if we match none, we return false": function(parser) {
+			var string = "(attr=1)";
+			var filter = parser.compile(string);
+
+			var map = {
+				attr: [0,2,3]
+			};
+			var result = filter.matches(map);
+			assert.isFalse(result);
+		},
+
+		"substring matching also works with arrays": function(parser) {
+			var string = "(attr=one*fine*day*)";
+			var filter = parser.compile(string);
+
+			var map = {
+				attr: "one very fine and lonely day"
+			};
+			var result = filter.matches(map);
+			assert.isTrue(result);
+		}
 	},
 
-	"some object work for attribute values": {
+	"some objects work for attribute values": {
+		topic: new FilterParser(),
+		"ones with a constructor that takes one argument and an equals or compareTo method": function(parser) {
+			function ObjConstructor(stringArg) {
+				this.val = stringArg;
+			}
+			ObjConstructor.prototype = {
+				equals: function(other) {
+					return this.val == other.val;
+				},
 
+				constructor: ObjConstructor
+			};
+
+			var string = "(attr=wonderful)";
+			var filter = parser.compile(string);
+
+			var map = {
+				attr: new ObjConstructor("wonderful")
+			};
+			var result = filter.matches(map);
+			assert.isTrue(result);
+
+			map.attr = new ObjConstructor("o no");
+			result = filter.matches(map);
+			assert.isFalse(result);
+		},
+
+		"not ones that dont meet those constraints": function(parser) {
+			
+		}
 	},
 
 	"alltogethernow": {

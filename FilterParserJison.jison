@@ -40,7 +40,8 @@
 <VALUE>[^\\()]+			return "VALUE_STR";
 <VALUE>"\\("			return "VALUE_STR";
 <VALUE>"\\)"			return "VALUE_STR";
-<VALUE>"\\"				return "VALUE_STR";
+<VALUE>"\\\\"			return "VALUE_STR";
+<VALUE>"\\*"			return "VALUE_STR";
 <VALUE>")"				this.popState(); return "RIGHT_PAREN";
 
 <ATTR>[^=><~()]+		this.popState(); return "ATTR_STR";

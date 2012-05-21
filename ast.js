@@ -18,7 +18,7 @@ AbstractOp.prototype = {
 		} else {
 			if (propertyValue instanceof Object) {
 				var constructor = propertyValue.constructor;
-				if (constructor.length === 1) {
+				if (constructor.length === 1 && constructor.name !== "Object") {
 					if (typeof propertyValue.compareTo === "function") {
 						var myValue = new constructor(this.value);
 						return propertyValue.compareTo(myValue) === 0;
