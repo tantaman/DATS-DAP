@@ -73,15 +73,26 @@ function SubstrOp(attr, value) {
  	this.type = "substr"; 
  	this.attr = attr; 
  	this.value = value;
- 	this.value = this.value.replace(replaceReg, ".*");
-
- 	this.value = new RegExp(this.value);
+ 	this.components = value.split("*");
 }
 
 SubstrOp.prototype = Object.create(AbstractOp.prototype);
 SubstrOp.prototype.__match = function(val) {
 	if (val != null) {
-		return this.value.exec(val) != null;
+		var lastIndexOf = 0;
+		var remainingVal = val;
+		var success = true;
+		this.components.every(function(component) {
+			var index = remainingVal.indexOf(component, lastIndexOf);
+			if (index > -1) {
+				lastIndexOf = index;
+				return true;
+			} else {
+				success = false;
+				return false;
+			}
+		}, this);
+		return success;
 	} else {
 		return false;
 	}
